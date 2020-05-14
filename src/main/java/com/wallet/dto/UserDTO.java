@@ -7,6 +7,7 @@ import org.hibernate.validator.constraints.Length;
 
 import lombok.Data;
 
+@SuppressWarnings("deprecation")
 @Data
 public class UserDTO {
 	
@@ -22,4 +23,4 @@ public class UserDTO {
 	@Length(min=6, message="A senha deve conter no minímo 6 caracteres!")
 	private String password;
 
-}
+} 
