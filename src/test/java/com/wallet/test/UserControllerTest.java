@@ -1,5 +1,6 @@
 package com.wallet.test;
 
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.junit.Test;
@@ -28,9 +29,11 @@ import com.wallet.service.UserService;
 @SpringBootTest
 public class UserControllerTest {
 	
+	private static final Long ID = 1L;
 	private static final String EMAIL="teste@teste.com";
 	private static final String NAME="teste";
 	private static final String PASSWORD="123456";
+	
 	private static final String URL = "/user";
 	
 	@MockBean
@@ -44,15 +47,29 @@ public class UserControllerTest {
 		
 		BDDMockito.given(userService.save(Mockito.any(User.class))).willReturn(getMockUser());
 		
-		mockMvc.perform(MockMvcRequestBuilders.post(URL).content(getJsonPayload())
+		mockMvc.perform(MockMvcRequestBuilders.post(URL).content(getJsonPayload(ID, EMAIL, NAME, PASSWORD))
 				.contentType(MediaType.APPLICATION_JSON)
 				.accept(MediaType.APPLICATION_JSON))
-			.andExpect(status().isCreated());
+			.andExpect(status().isCreated())
+			.andExpect(jsonPath("$.data.id").value(ID))
+			.andExpect(jsonPath("$.data.nome").value(NAME))
+			.andExpect(jsonPath("$.data.email").value(EMAIL))
+			.andExpect(jsonPath("$.data.password").value(PASSWORD));
+	}
+	
+	@Test
+	public void testSaveInvalidUser() throws JsonProcessingException, Exception {
 		
+		mockMvc.perform(MockMvcRequestBuilders.post(URL).content(getJsonPayload(ID, "email", NAME, PASSWORD))
+				.contentType(MediaType.APPLICATION_JSON)
+				.accept(MediaType.APPLICATION_JSON))
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.errors[0]").value("Email inválido!"));
 	}
 	
 	public User getMockUser() {
 		User user = new User();
+		user.setId(ID);
 		user.setEmail(EMAIL);
 		user.setName(NAME);
 		user.setPassword(PASSWORD);
@@ -60,11 +77,12 @@ public class UserControllerTest {
 		return user;
 	}
 	
-	public String getJsonPayload() throws JsonProcessingException {
+	public String getJsonPayload(Long id, String email, String nome, String password) throws JsonProcessingException {
 		UserDTO userDTO = new UserDTO();
-		userDTO.setEmail(EMAIL);
-		userDTO.setNome(NAME);
-		userDTO.setPassword(PASSWORD);
+		userDTO.setId(id);
+		userDTO.setEmail(email);
+		userDTO.setNome(nome);
+		userDTO.setPassword(password);
 		
 		ObjectMapper mapper = new ObjectMapper();
 		return mapper.writeValueAsString(userDTO);

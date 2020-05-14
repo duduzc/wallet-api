@@ -50,10 +50,17 @@
 			<optional>true</optional>
 		</dependency>
 		
-		<!-- Banco H2 -->
+		<!-- Banco H2 - Testes -->
 		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		
+		<!-- Banco Postgresql - Dev e Prod -->
+		<dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
 			<scope>runtime</scope>
 		</dependency>
 	</dependencies>
