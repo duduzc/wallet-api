@@ -1,5 +1,7 @@
 package com.wallet.controller;
 
+import java.util.List;
+
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,9 +50,9 @@ public class UserController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
 	
-	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
-	public ResponseEntity<User> getById(@PathVariable(value = "id") long id) { 
-		User entity = userRepository.findById(id).orElse(null);
+	@RequestMapping(method = RequestMethod.GET)
+	public ResponseEntity<List<User>> getById() { 
+		List<User> entity = userRepository.findAll();
 		return entity != null ? ResponseEntity.ok(entity) : ResponseEntity.notFound().build();
 	}
 	
