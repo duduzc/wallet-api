@@ -6,13 +6,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.wallet.dto.UserDTO;
 import com.wallet.entity.User;
+import com.wallet.repository.UserRepository;
 import com.wallet.response.Response;
 import com.wallet.service.UserService;
 import com.wallet.util.Bcrypt;
@@ -23,6 +26,9 @@ public class UserController {
 	
 	@Autowired
 	private UserService userService;
+	
+	@Autowired
+	private UserRepository userRepository;
 	
 	@PostMapping
 	public ResponseEntity<Response<UserDTO>> create(@Valid @RequestBody UserDTO userDTO, BindingResult result) {
@@ -41,7 +47,13 @@ public class UserController {
 		
 		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
-
+	
+	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
+	public ResponseEntity<User> getById(@PathVariable(value = "id") long id) { 
+		User entity = userRepository.findById(id).orElse(null);
+		return entity != null ? ResponseEntity.ok(entity) : ResponseEntity.notFound().build();
+	}
+	
 	private User convertDTOToEntity(UserDTO userDTO) {
 		User user = new User();
 		user.setId(userDTO.getId());
